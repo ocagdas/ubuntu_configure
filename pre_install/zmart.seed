@@ -1,0 +1,128 @@
+####
+# http://ubuntuforums.org/showthread.php?t=2215103
+# https://bugs.launchpad.net/ubuntu/+source/debian-installer/+bug/1347726
+d-i preseed/early_command string umount /media || true
+
+d-i debian-installer/framebuffer boolean false
+d-i debian-installer/locale string en_GB
+d-i console-setup/ask_detect boolean false
+d-i keyboard-configuration/layoutcode string gb
+d-i netcfg/get_hostname string preseeded
+d-i netcfg/choose_interface select auto
+
+d-i debian-installer/country string GB
+d-i debian-installer/language string en
+
+d-i mirror/country string GB
+d-i mirror/http/countries select GB
+d-i mirror/http/hostname string archive.ubuntu.com
+d-i mirror/http/directory string /ubuntu
+d-i mirror/http/proxy string
+d-i mirror/http/mirror select gb.archive.ubuntu.com
+
+d-i clock-setup/utc boolean true
+d-i time/zone string Europe/London
+d-i clock-setup/ntp boolean true
+
+d-i partman/early_command string \
+	USBDEV=$(list-devices usb-partition | sed "s/\(.*\)./\1/");\
+	if [ ! -z "$USBDEV" ]; then \
+		BOOTDEV=$(list-devices disk | grep -v "$USBDEV" | head -1);\
+	else \
+		BOOTDEV=$(list-devices disk | head -1);\
+	fi; \
+	debconf-set partman-auto/disk $BOOTDEV;\
+	debconf-set grub-installer/bootdev $BOOTDEV;\
+	lvremove --select all -ff -y; vgremove --select all -ff -y; pvremove ${BOOTDEV}* -ff -y
+
+#d-i partman-auto/disk string /dev/sda
+#d-i grub-installer/bootdev string /dev/sda
+
+d-i partman-auto/method string crypto
+d-i partman-crypto/erase_data boolean false
+d-i partman-crypto/passphrase password ubuntu
+d-i partman-crypto/passphrase-again password ubuntu
+d-i partman-crypto/weak_passphrase boolean true
+d-i partman-lvm/device_remove_lvm boolean true
+d-i partman-auto/purge_lvm_from_device boolean true
+d-i partman-lvm/confirm boolean true
+d-i partman-lvm/confirm_nooverwrite boolean true
+d-i partman-auto-lvm/guided_size string max
+d-i partman-auto-lvm/new_vg_name string vg-main-crypt
+d-i partman-auto/choose_recipe select lvm-main
+d-i partman-auto/expert_recipe string                         \
+      lvm-main ::                                             \
+              1 1 1 free                                      \
+                      $bios_boot{ }                           \
+                      method{ biosgrub }                      \
+              .                                               \
+              512 40 512 fat32                                \
+                      $primary{ }                             \
+                      $lvmignore{ }                           \
+                      method{ efi }                           \
+                      format{ }                               \
+              .                                               \
+              1536 1536 1536 ext3                             \
+                      $primary{ } $bootable{ }                \
+                      method{ format } format{ }              \
+                      use_filesystem{ } filesystem{ ext4 }    \
+                      mountpoint{ /boot }                     \
+              .                                               \
+              2048 2048 2048 linux-swap                       \
+                      $lvmok{ } lv_name{ swap }               \
+                      in_vg { vg-main-crypt }                 \
+                      $primary{ }                             \
+                      method{ swap } format{ }                \
+              .                                               \
+              500 10000 1000000000 ext4                       \
+                      $lvmok{ } lv_name{ root }               \
+                      in_vg { vg-main-crypt }                 \
+                      $primary{ }                             \
+                      method{ format } format{ }              \
+                      use_filesystem{ } filesystem{ ext4 }    \
+                      mountpoint{ / }                         \
+              .
+
+d-i partman-md/confirm boolean true
+d-i partman-md/confirm_nooverwrite boolean true
+d-i partman-md/device_remove_md boolean true
+d-i partman-basicfilesystems/no_mount_point boolean false
+d-i partman-partitioning/confirm_write_new_label boolean true
+d-i partman/choose_partition select finish
+d-i partman/confirm boolean true
+d-i partman/confirm_nooverwrite boolean true
+d-i partman/confirm_write_new_label boolean true
+
+d-i passwd/root-login boolean false
+d-i passwd/user-fullname string Temporary Admin
+d-i passwd/username string ubuntu
+d-i passwd/user-password password ubuntu
+d-i passwd/user-password-again password ubuntu
+d-i user-setup/allow-password-weak boolean true
+d-i user-setup/encrypt-home boolean false
+
+d-i apt-setup/universe boolean true
+d-i apt-setup/security_host string security.ubuntu.com
+d-i apt-setup/security_path string /ubuntu
+
+tasksel tasksel/first multiselect server
+# tasksel tasksel/first multiselect openssh-server
+
+# d-i pkgsel/include string openssh-server build-essential dkms git vim aptitude apt-transport-https ca-certificates curl software-properties-common
+d-i pkgsel/include string build-essential dkms git vim aptitude apt-transport-https ca-certificates curl software-properties-common network-manager
+d-i pkgsel/upgrade select safe-upgrade
+d-i pkgsel/language-packs multiselect en
+d-i pkgsel/update-policy select none
+d-i pkgsel/updatedb boolean false
+d-i grub-installer/only_debian boolean true
+
+# blacklisting vga16fb because it is very slow in VirtualBox
+d-i preseed/late_command string echo "blacklist vga16fb" | sudo tee /target/etc/modprobe.d/novga16fb.conf > /dev/null 2>&1
+
+# get target to start with a text console instead of this plymouth nonsense that crashes and prevents login
+d-i preseed/late_command string \
+  cp /cdrom/target_skeleton/* /target/. -R
+
+#d-i finish-install/reboot_in_progress note
+d-i debian-installer/exit/poweroff boolean true
+
