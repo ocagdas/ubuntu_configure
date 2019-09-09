@@ -5,13 +5,18 @@ if [ `id -u` -ne '0' ]; then
 	exit -1
 fi
 
+sudo add-apt-repository "deb http://archive.canonical.com/ $(lsb_release -sc) partner"
+
 apt-get update
+apt -y upgrade
+
 DEBIAN_FRONTEND=noninteractive apt install -y \
 	synergy \
 	vlc browser-plugin-vlc \
 	simplescreenrecorder \
 	libdvdnav4 libdvdread4 gstreamer1.0-plugins-bad gstreamer1.0-plugins-ugly libdvd-pkg \
-	ubuntu-restricted-extras
+	ubuntu-restricted-extras \
+	adobe-flashplugin browser-plugin-freshplayer-pepperflash
 
 sudo snap install cool-retro-term --classic
 

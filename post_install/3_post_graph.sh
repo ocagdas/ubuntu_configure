@@ -16,7 +16,8 @@ sudo DEBIAN_FRONTEND=noninteractive apt install -y \
 	galculator \
 	clipit \
 	cutecom \
-	graphviz 
+	graphviz \
+	synaptic
 
 ./wireshark.sh
 ./anaconda.sh
