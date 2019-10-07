@@ -45,7 +45,7 @@ sudo DEBIAN_FRONTEND=noninteractive apt install -y curl \
 	unetbootin \
 	figlet \
 	pdfgrep \
-	ssh sshfs \
+	ssh sshfs cifs-utils \
 	openvpn resolvconf \
 	git mercurial \
 	doxygen \
