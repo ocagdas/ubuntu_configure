@@ -12,6 +12,7 @@ apt -y upgrade
 
 DEBIAN_FRONTEND=noninteractive apt install -y \
 	synergy \
+	gimp \
 	vlc browser-plugin-vlc \
 	simplescreenrecorder \
 	libdvdnav4 libdvdread4 gstreamer1.0-plugins-bad gstreamer1.0-plugins-ugly libdvd-pkg \
