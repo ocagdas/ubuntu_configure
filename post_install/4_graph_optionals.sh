@@ -52,7 +52,7 @@ apt purge ttf-mscorefonts-installer
 TTF_DEB_FILE="ttf-mscorefonts-installer_3.7_all.deb"
 wget http://ftp.de.debian.org/debian/pool/contrib/m/msttcorefonts/$TTF_DEB_FILE
 if [ -f "$TTF_DEB_FILE" ]; then
-	apt install $PWD/$TTF_DEB_FILE
+	apt install -y $PWD/$TTF_DEB_FILE
 	rm -f $TTF_DEB_FILE
 fi
 
