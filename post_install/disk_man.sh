@@ -7,8 +7,11 @@ fi
 
 enc_selection="";
 while [ "$enc_selection" != "y" ] && [ "$enc_selection" != "n" ]; do
-	read -p "Do you want to add other internal disks to the encrypted volumes [y/n]: " enc_selection;
+	read -t 10 -p "Do you want to add other internal disks to the encrypted volumes [y/N]: " enc_selection;
 	enc_selection=${enc_selection,,};
+	if [ -z "$enc_selection" ]; then
+		enc_selection="n"
+	fi
 done
 
 if [ "${enc_selection}" == "n" ]; then

@@ -28,8 +28,11 @@ sudo DEBIAN_FRONTEND=noninteractive apt install -y \
 
 opt_selection="";
 while [ "$opt_selection" != "y" ] && [ "$opt_selection" != "n" ]; do
-	read -p "Do you want to proceed to installing optional packages [y/n]: " opt_selection;
+	read -t 10 -p "Do you want to proceed to installing optional packages [Y/n]: " opt_selection;
 	opt_selection=${opt_selection,,};
+	if [ -z "$opt_selection" ]; then
+		opt_selection="y"
+	fi
 done
 
 if [ "${opt_selection}" == "y" ]; then
