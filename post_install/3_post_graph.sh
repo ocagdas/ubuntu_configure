@@ -25,6 +25,7 @@ sudo DEBIAN_FRONTEND=noninteractive apt install -y \
 ./visual_studio_code.sh
 ./skype.sh
 ./sensors.sh
+./mic_noise_cancelling.sh
 
 opt_selection="";
 while [ "$opt_selection" != "y" ] && [ "$opt_selection" != "n" ]; do
